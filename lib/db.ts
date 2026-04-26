@@ -2,7 +2,9 @@ import { Pool } from "pg";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
+  ssl: process.env.DATABASE_URL?.includes('railway') 
+    ? false 
+    : { rejectUnauthorized: false, checkServerIdentity: () => undefined },
 });
 
 export async function query(text: string, params?: unknown[]) {

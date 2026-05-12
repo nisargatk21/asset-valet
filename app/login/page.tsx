@@ -2,201 +2,269 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2, Shield, Monitor, Smartphone, Tablet, Lock, User } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ username: "", password: "" });
-  const [showPass, setShowPass] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault(); setError(""); setLoading(true);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
     try {
-      const res = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
       const data = await res.json();
-      if (!res.ok) { setError(data.error); return; }
+      if (!res.ok) throw new Error(data.error || "Invalid credentials");
       router.push(data.role === "admin" ? "/dashboard" : "/employee");
-    } catch { setError("Network error. Please try again."); } finally { setLoading(false); }
-  }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Invalid username or password");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", background: "#030a05", fontFamily: "'DM Sans',system-ui,sans-serif" }}>
-      
-      {/* ── LEFT PANEL ── */}
-      <div style={{ flex: 1, position: "relative", display: "flex", flexDirection: "column", justifyContent: "center", padding: "5rem", overflow: "hidden", background: "linear-gradient(160deg,#030a05 0%,#061208 40%,#0c2414 100%)" }}>
-        
-        {/* Grid overlay */}
-        <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(34,197,94,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,.06) 1px,transparent 1px)", backgroundSize: "56px 56px", pointerEvents: "none" }} />
-        
-        {/* Glow orbs */}
-        <div style={{ position: "absolute", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle,rgba(34,197,94,.07) 0%,transparent 65%)", top: -200, left: -150, pointerEvents: "none" }} />
-        <div style={{ position: "absolute", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle,rgba(34,197,94,.05) 0%,transparent 65%)", bottom: -100, right: -50, pointerEvents: "none" }} />
-
-        {/* Badge */}
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 18px", borderRadius: 99, border: "1px solid rgba(34,197,94,.25)", background: "rgba(34,197,94,.07)", marginBottom: "2.5rem", width: "fit-content" }}>
-          <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 6px #22c55e" }} />
-          <span style={{ fontSize: 11, fontWeight: 700, color: "#22c55e", textTransform: "uppercase", letterSpacing: ".12em" }}>Asset Management Platform</span>
-        </div>
-
-        {/* Heading */}
-        <h1 style={{ fontSize: "5rem", fontWeight: 900, lineHeight: .95, marginBottom: "1.75rem", letterSpacing: "-.04em" }}>
-          <span style={{ color: "#e4fced" }}>Asset</span><br />
-          <span style={{ color: "#22c55e" }}>Valet</span>
-        </h1>
-
-        <p style={{ fontSize: 17, color: "rgba(228,252,237,.45)", lineHeight: 1.7, marginBottom: "3rem", maxWidth: 340 }}>
-          Growth driven by Assets,<br />led by people.
-        </p>
-
-        {/* Stats */}
-        <div style={{ display: "flex", gap: "2.5rem", marginBottom: "3rem" }}>
-          {[{ v: "99.9%", l: "Uptime" }, { v: "256-bit", l: "Encrypted" }, { v: "Real-time", l: "Tracking" }].map(s => (
-            <div key={s.l}>
-              <div style={{ fontSize: 18, fontWeight: 800, color: "#22c55e" }}>{s.v}</div>
-              <div style={{ fontSize: 11.5, color: "rgba(228,252,237,.35)", fontWeight: 500, marginTop: 3, textTransform: "uppercase", letterSpacing: ".06em" }}>{s.l}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Device bar */}
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 14, padding: "16px 24px", borderRadius: 14, background: "rgba(34,197,94,.05)", border: "1px solid rgba(34,197,94,.12)" }}>
-          <Monitor size={26} style={{ color: "#22c55e" }} />
-          <div style={{ width: 1, height: 28, background: "rgba(34,197,94,.18)" }} />
-          <Smartphone size={20} style={{ color: "rgba(34,197,94,.45)" }} />
-          <div style={{ width: 1, height: 28, background: "rgba(34,197,94,.12)" }} />
-          <Tablet size={22} style={{ color: "rgba(34,197,94,.35)" }} />
-        </div>
-
-        {/* Bottom branding */}
-        <div style={{ position: "absolute", bottom: "2rem", left: "5rem", display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(34,197,94,.12)", border: "1px solid rgba(34,197,94,.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Shield size={14} style={{ color: "#22c55e" }} />
-          </div>
-          <span style={{ fontSize: 12, color: "rgba(228,252,237,.25)", fontWeight: 600 }}>AssetValet © 2024</span>
-        </div>
-      </div>
-
-      {/* ── RIGHT PANEL ── */}
-      <div style={{ width: 500, display: "flex", alignItems: "center", justifyContent: "center", background: "#040c07", borderLeft: "1px solid rgba(34,197,94,.08)", padding: "2.5rem" }}>
-        <div style={{ width: "100%", maxWidth: 400 }}>
-
-          {/* Logo */}
-          <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 64, height: 64, borderRadius: 20, background: "rgba(34,197,94,.1)", border: "1px solid rgba(34,197,94,.25)", marginBottom: 18, position: "relative" }}>
-              <Shield size={30} style={{ color: "#22c55e" }} />
-            </div>
-            <h2 style={{ fontSize: "1.6rem", fontWeight: 900, color: "#e4fced", letterSpacing: "-.03em", margin: 0 }}>Welcome Back</h2>
-            <p style={{ color: "rgba(228,252,237,.35)", fontSize: 14, marginTop: 6, fontWeight: 500 }}>Sign in to Asset Valet</p>
-          </div>
-
-          {/* Error */}
-          {error && (
-            <div style={{ marginBottom: "1.25rem", padding: "12px 16px", borderRadius: 10, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", color: "#fca5a5", fontSize: 13, display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 16 }}>⚠</span> {error}
-            </div>
-          )}
-
-          {/* Form */}
-          <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
-
-            {/* Username */}
-            <div>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".09em", color: "rgba(228,252,237,.4)", marginBottom: 8 }}>Username</label>
-              <div style={{ position: "relative" }}>
-                <User size={15} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "rgba(34,197,94,.4)", pointerEvents: "none" }} />
-                <input type="text" placeholder="Enter your username" required autoFocus value={form.username}
-                  onChange={e => setForm({ ...form, username: e.target.value })}
-                  style={{ width: "100%", background: "rgba(255,255,255,.03)", border: "1px solid rgba(34,197,94,.12)", borderRadius: 11, padding: "13px 16px 13px 40px", color: "#e4fced", fontSize: 14, outline: "none", fontFamily: "inherit", transition: "border-color .15s, box-shadow .15s" }}
-                  onFocus={e => { e.target.style.borderColor = "rgba(34,197,94,.4)"; e.target.style.boxShadow = "0 0 0 3px rgba(34,197,94,.08)"; }}
-                  onBlur={e => { e.target.style.borderColor = "rgba(34,197,94,.12)"; e.target.style.boxShadow = "none"; }} />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".09em", color: "rgba(228,252,237,.4)", marginBottom: 8 }}>Password</label>
-              <div style={{ position: "relative" }}>
-                <Lock size={15} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "rgba(34,197,94,.4)", pointerEvents: "none" }} />
-                <input type={showPass ? "text" : "password"} placeholder="••••••••" required value={form.password}
-                  onChange={e => setForm({ ...form, password: e.target.value })}
-                  style={{ width: "100%", background: "rgba(255,255,255,.03)", border: "1px solid rgba(34,197,94,.12)", borderRadius: 11, padding: "13px 44px 13px 40px", color: "#e4fced", fontSize: 14, outline: "none", fontFamily: "inherit", transition: "border-color .15s, box-shadow .15s" }}
-                  onFocus={e => { e.target.style.borderColor = "rgba(34,197,94,.4)"; e.target.style.boxShadow = "0 0 0 3px rgba(34,197,94,.08)"; }}
-                  onBlur={e => { e.target.style.borderColor = "rgba(34,197,94,.12)"; e.target.style.boxShadow = "none"; }} />
-                <button type="button" onClick={() => setShowPass(!showPass)}
-                  style={{ position: "absolute", right: 13, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "rgba(228,252,237,.25)", padding: 2 }}>
-                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-
-            {/* Remember + Forgot */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: -2 }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} style={{ width: 15, height: 15, accentColor: "#22c55e", cursor: "pointer" }} />
-                <span style={{ fontSize: 13, color: "rgba(228,252,237,.4)", fontWeight: 500 }}>Remember me</span>
-              </label>
-              <span style={{ fontSize: 13, color: "#22c55e", cursor: "pointer", fontWeight: 700 }}>Forgot Password?</span>
-            </div>
-
-            {/* Login Button */}
-            <button type="submit" disabled={loading}
-              style={{ width: "100%", padding: "15px", marginTop: 4, borderRadius: 11, background: loading ? "rgba(34,197,94,.5)" : "linear-gradient(135deg,#22c55e,#15803d)", border: "none", color: "#fff", fontSize: 15, fontWeight: 800, cursor: loading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "inherit", letterSpacing: ".01em", boxShadow: loading ? "none" : "0 4px 24px rgba(34,197,94,.25)", transition: "all .2s" }}>
-              {loading ? <><Loader2 size={17} style={{ animation: "spin .7s linear infinite" }} /> Signing in...</> : "Login"}
-            </button>
-
-            {/* Sign up link */}
-            <p style={{ textAlign: "center", fontSize: 13.5, color: "rgba(228,252,237,.35)", fontWeight: 500 }}>
-              Don&apos;t have an account?{" "}
-              <Link href="/signup" style={{ color: "#22c55e", fontWeight: 800, textDecoration: "none" }}>Sign Up</Link>
-            </p>
-
-            {/* Divider */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ flex: 1, height: 1, background: "rgba(34,197,94,.08)" }} />
-              <span style={{ fontSize: 10.5, color: "rgba(228,252,237,.2)", fontWeight: 700, letterSpacing: ".08em" }}>OR CONTINUE WITH</span>
-              <div style={{ flex: 1, height: 1, background: "rgba(34,197,94,.08)" }} />
-            </div>
-
-            {/* Social */}
-            <div style={{ display: "flex", gap: 10 }}>
-              {[{ l: "G", c: "#ea4335" }, { l: "in", c: "#0077b5" }, { l: "✉", c: "#22c55e" }].map(s => (
-                <button key={s.l} type="button"
-                  style={{ flex: 1, padding: "12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", cursor: "pointer", fontSize: 14, fontWeight: 800, color: s.c, fontFamily: "inherit", transition: "background .15s" }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.06)")}
-                  onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,.03)")}>
-                  {s.l}
-                </button>
-              ))}
-            </div>
-          </form>
-
-          {/* Demo credentials */}
-          <div style={{ marginTop: "1.75rem", padding: "14px 16px", borderRadius: 12, background: "rgba(34,197,94,.04)", border: "1px solid rgba(34,197,94,.1)" }}>
-            <p style={{ fontSize: 10, fontWeight: 800, color: "rgba(34,197,94,.5)", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 10 }}>Demo Credentials</p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              {[{ role: "Admin", u: "admin", p: "Admin@123", sub: "Full access" }, { role: "Employee", u: "sara.khan", p: "Pass@123", sub: "Limited access" }].map(d => (
-                <button key={d.role} type="button"
-                  onClick={() => setForm({ username: d.u, password: d.p })}
-                  style={{ padding: "10px 12px", borderRadius: 9, background: "rgba(34,197,94,.06)", border: "1px solid rgba(34,197,94,.14)", cursor: "pointer", textAlign: "left", fontFamily: "inherit", transition: "background .15s, border-color .15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(34,197,94,.12)"; e.currentTarget.style.borderColor = "rgba(34,197,94,.28)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(34,197,94,.06)"; e.currentTarget.style.borderColor = "rgba(34,197,94,.14)"; }}>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: "#22c55e" }}>{d.role}</div>
-                  <div style={{ fontSize: 11, color: "rgba(228,252,237,.3)", marginTop: 2 }}>{d.sub}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <>
       <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-        input::placeholder { color: rgba(228,252,237,0.18) !important; }
-        * { box-sizing: border-box; }
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Sora', sans-serif; background: #020d0b; overflow: hidden; }
+        .page {
+          min-height: 100vh; width: 100%; display: flex;
+          background: radial-gradient(ellipse 80% 60% at 20% 50%, #001a12 0%, #020d0b 60%),
+                      radial-gradient(ellipse 50% 50% at 80% 50%, #001510 0%, transparent 70%);
+          position: relative; overflow: hidden;
+        }
+        .blob1 { position:absolute; width:500px; height:500px; border-radius:50%; background:radial-gradient(circle,rgba(0,245,176,0.08) 0%,transparent 70%); top:-100px; left:-100px; pointer-events:none; }
+        .blob2 { position:absolute; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle,rgba(0,245,176,0.06) 0%,transparent 70%); bottom:-100px; right:300px; pointer-events:none; }
+        .blob3 { position:absolute; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(0,245,176,0.05) 0%,transparent 70%); top:50%; right:100px; pointer-events:none; }
+        .grid-lines { position:absolute; inset:0; background-image:linear-gradient(rgba(0,245,176,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,176,0.03) 1px,transparent 1px); background-size:60px 60px; pointer-events:none; }
+        .left { flex:1; display:flex; flex-direction:column; justify-content:center; padding:60px 60px 60px 80px; position:relative; z-index:1; }
+        .platform-label { display:flex; align-items:center; gap:12px; margin-bottom:36px; }
+        .platform-label::before { content:''; display:block; width:40px; height:1.5px; background:#00f5b0; }
+        .platform-label span { font-size:11px; font-weight:600; letter-spacing:0.18em; color:#00f5b0; text-transform:uppercase; }
+        .main-heading { margin-bottom:20px; }
+        .main-heading .asset { display:block; font-size:76px; font-weight:800; color:#ffffff; line-height:1; letter-spacing:-2px; }
+        .main-heading .valet { display:block; font-size:76px; font-weight:800; color:#00f5b0; line-height:1; letter-spacing:-2px; text-shadow:0 0 40px rgba(0,245,176,0.5),0 0 80px rgba(0,245,176,0.2); }
+        .subtitle { font-size:15px; color:#5a9e88; font-weight:400; line-height:1.6; max-width:300px; margin-bottom:56px; border-left:2px solid rgba(0,245,176,0.3); padding-left:16px; }
+        .devices { position:relative; width:420px; height:220px; margin-bottom:56px; margin-left:-10px; }
+        .device-laptop { position:absolute; left:0; bottom:0; width:260px; animation:float1 4s ease-in-out infinite; }
+        .laptop-screen { width:260px; height:160px; background:rgba(0,245,176,0.04); border:1.5px solid rgba(0,245,176,0.18); border-radius:10px 10px 0 0; overflow:hidden; }
+        .laptop-screen-inner { margin:10px; height:calc(100% - 20px); background:rgba(0,245,176,0.03); border-radius:6px; border:1px solid rgba(0,245,176,0.08); display:flex; flex-direction:column; gap:6px; padding:10px; }
+        .screen-bar { height:6px; border-radius:3px; background:rgba(0,245,176,0.15); }
+        .screen-bar.short { width:60%; }
+        .screen-bar.medium { width:80%; }
+        .screen-bar.tiny { width:40%; height:4px; background:rgba(0,245,176,0.08); }
+        .screen-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:4px; }
+        .screen-card { height:28px; border-radius:4px; background:rgba(0,245,176,0.07); border:1px solid rgba(0,245,176,0.1); }
+        .laptop-base { width:280px; height:12px; background:rgba(0,245,176,0.08); border:1.5px solid rgba(0,245,176,0.15); border-top:none; border-radius:0 0 6px 6px; margin-left:-10px; }
+        .device-tablet { position:absolute; right:60px; top:10px; width:90px; animation:float2 4.5s ease-in-out infinite 0.5s; }
+        .tablet-body { width:90px; height:120px; background:rgba(0,245,176,0.04); border:1.5px solid rgba(0,245,176,0.18); border-radius:10px; padding:8px 6px; display:flex; flex-direction:column; gap:5px; }
+        .tablet-bar { height:5px; border-radius:3px; background:rgba(0,245,176,0.15); }
+        .tablet-bar.s { width:70%; }
+        .tablet-bar.m { width:90%; }
+        .tablet-icon { width:20px; height:20px; border-radius:5px; background:rgba(0,245,176,0.12); border:1px solid rgba(0,245,176,0.2); margin:2px auto; }
+        .device-phone { position:absolute; right:10px; bottom:20px; width:55px; animation:float3 3.8s ease-in-out infinite 1s; }
+        .phone-body { width:55px; height:100px; background:rgba(0,245,176,0.04); border:1.5px solid rgba(0,245,176,0.18); border-radius:12px; padding:8px 5px; display:flex; flex-direction:column; gap:4px; align-items:center; }
+        .phone-notch { width:20px; height:4px; border-radius:2px; background:rgba(0,245,176,0.2); margin-bottom:4px; }
+        .phone-bar { height:4px; border-radius:2px; background:rgba(0,245,176,0.15); width:100%; }
+        .phone-bar.s { width:70%; }
+        @keyframes float1 { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-10px)} }
+        @keyframes float2 { 0%,100%{transform:translateY(0px) rotate(2deg)} 50%{transform:translateY(-14px) rotate(2deg)} }
+        @keyframes float3 { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-8px)} }
+        .stats { display:flex; gap:48px; }
+        .stat-value { font-size:22px; font-weight:700; color:#00f5b0; text-shadow:0 0 20px rgba(0,245,176,0.4); }
+        .stat-label { font-size:11px; color:#4a8870; font-weight:400; margin-top:2px; letter-spacing:0.05em; }
+        .right { width:480px; display:flex; align-items:center; justify-content:center; padding:40px 48px; position:relative; z-index:1; }
+        .card { width:100%; max-width:380px; background:rgba(5,28,22,0.7); border:1px solid rgba(0,245,176,0.15); border-radius:28px; padding:40px 36px; backdrop-filter:blur(24px); box-shadow:0 0 0 1px rgba(0,245,176,0.05),0 20px 60px rgba(0,0,0,0.6),inset 0 1px 0 rgba(0,245,176,0.1); animation:fadeInUp 0.6s ease both; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+        .card-icon { width:52px; height:52px; margin:0 auto 24px; border-radius:14px; background:linear-gradient(135deg,rgba(0,245,176,0.2),rgba(0,245,176,0.05)); border:1px solid rgba(0,245,176,0.3); display:flex; align-items:center; justify-content:center; box-shadow:0 0 24px rgba(0,245,176,0.2); }
+        .card-title { text-align:center; font-size:26px; font-weight:700; color:#ffffff; margin-bottom:6px; letter-spacing:-0.5px; }
+        .card-sub { text-align:center; font-size:13px; color:#5a9e88; margin-bottom:32px; }
+        .field { margin-bottom:16px; }
+        .field-label { display:block; font-size:10px; font-weight:600; letter-spacing:0.12em; color:#4a8870; text-transform:uppercase; margin-bottom:8px; }
+        .field-input { width:100%; background:rgba(0,245,176,0.04); border:1px solid rgba(0,245,176,0.12); border-radius:12px; padding:13px 16px; font-size:14px; font-family:'Sora',sans-serif; color:#e0f5ee; outline:none; transition:all 0.2s; }
+        .field-input::placeholder { color:#2d6657; }
+        .field-input:focus { border-color:rgba(0,245,176,0.4); background:rgba(0,245,176,0.07); box-shadow:0 0 0 3px rgba(0,245,176,0.08); }
+        .row-options { display:flex; align-items:center; justify-content:space-between; margin:6px 0 24px; }
+        .remember { display:flex; align-items:center; gap:8px; cursor:pointer; }
+        .remember input[type=checkbox] { width:15px; height:15px; accent-color:#00f5b0; cursor:pointer; }
+        .remember span { font-size:12px; color:#5a9e88; }
+        .forgot { font-size:12px; color:#00f5b0; text-decoration:none; opacity:0.8; }
+        .btn-login { width:100%; padding:14px; background:linear-gradient(135deg,#00f5b0,#00c98f); border:none; border-radius:14px; font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:#020d0b; cursor:pointer; transition:all 0.2s; box-shadow:0 0 30px rgba(0,245,176,0.3); letter-spacing:0.02em; margin-bottom:20px; }
+        .btn-login:hover { transform:translateY(-1px); box-shadow:0 0 40px rgba(0,245,176,0.45); }
+        .btn-login:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+        .signup-row { text-align:center; font-size:12.5px; color:#4a8870; margin-bottom:24px; }
+        .signup-row a { color:#00f5b0; text-decoration:none; font-weight:600; }
+        .error-msg { background:rgba(255,80,80,0.08); border:1px solid rgba(255,80,80,0.2); border-radius:10px; padding:10px 14px; font-size:12px; color:#ff6b6b; margin-bottom:16px; text-align:center; }
+        .divider { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+        .divider-line { flex:1; height:1px; background:rgba(0,245,176,0.1); }
+        .divider-text { font-size:10px; font-weight:600; letter-spacing:0.1em; color:#2d6657; text-transform:uppercase; }
+        .social-row { display:flex; gap:12px; justify-content:center; }
+        .social-btn { flex:1; height:44px; background:rgba(0,245,176,0.04); border:1px solid rgba(0,245,176,0.12); border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; }
+        .social-btn:hover { background:rgba(0,245,176,0.08); border-color:rgba(0,245,176,0.25); }
+        .social-btn svg { width:18px; height:18px; }
+
+        /* Demo credentials */
+        .demo-box { margin-top:20px; padding:12px 14px; border-radius:12px; background:rgba(0,245,176,0.04); border:1px solid rgba(0,245,176,0.1); }
+        .demo-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(0,245,176,0.5); margin-bottom:8px; }
+        .demo-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .demo-btn { padding:8px 10px; border-radius:8px; background:rgba(0,245,176,0.06); border:1px solid rgba(0,245,176,0.15); cursor:pointer; text-align:left; font-family:'Sora',sans-serif; transition:all .15s; }
+        .demo-btn:hover { background:rgba(0,245,176,0.12); }
+        .demo-role { font-size:11px; font-weight:700; color:#00f5b0; }
+        .demo-user { font-size:10px; color:rgba(224,245,238,0.35); margin-top:1px; }
       `}</style>
-    </div>
+
+      <div className="page">
+        <div className="blob1" /><div className="blob2" /><div className="blob3" />
+        <div className="grid-lines" />
+
+        {/* LEFT */}
+        <div className="left">
+          <div className="platform-label"><span>Asset Management Platform</span></div>
+          <div className="main-heading">
+            <span className="asset">Asset</span>
+            <span className="valet">Valet</span>
+          </div>
+          <p className="subtitle">Growth driven by Assets,<br />led by people.</p>
+
+          <div className="devices">
+            <div className="device-laptop">
+              <div className="laptop-screen">
+                <div className="laptop-screen-inner">
+                  <div className="screen-bar short" />
+                  <div className="screen-bar medium" />
+                  <div className="screen-bar tiny" />
+                  <div className="screen-grid">
+                    <div className="screen-card" /><div className="screen-card" />
+                    <div className="screen-card" /><div className="screen-card" />
+                  </div>
+                </div>
+              </div>
+              <div className="laptop-base" />
+            </div>
+            <div className="device-tablet">
+              <div className="tablet-body">
+                <div className="tablet-icon" />
+                <div className="tablet-bar m" /><div className="tablet-bar s" />
+                <div className="tablet-bar m" /><div className="tablet-bar s" />
+              </div>
+            </div>
+            <div className="device-phone">
+              <div className="phone-body">
+                <div className="phone-notch" />
+                <div className="phone-bar" /><div className="phone-bar s" />
+                <div className="phone-bar" /><div className="phone-bar s" />
+                <div className="phone-bar" />
+              </div>
+            </div>
+          </div>
+
+          <div className="stats">
+            <div><div className="stat-value">99.9%</div><div className="stat-label">Uptime</div></div>
+            <div><div className="stat-value">256-bit</div><div className="stat-label">Encrypted</div></div>
+            <div><div className="stat-value">Real-time</div><div className="stat-label">Tracking</div></div>
+          </div>
+        </div>
+
+        {/* RIGHT */}
+        <div className="right">
+          <div className="card">
+            <div className="card-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="3" width="7" height="7" rx="2" fill="#00f5b0"/>
+                <rect x="14" y="3" width="7" height="7" rx="2" fill="#00f5b0" opacity="0.6"/>
+                <rect x="3" y="14" width="7" height="7" rx="2" fill="#00f5b0" opacity="0.6"/>
+                <rect x="14" y="14" width="7" height="7" rx="2" fill="#00f5b0" opacity="0.3"/>
+              </svg>
+            </div>
+            <h1 className="card-title">Welcome Back</h1>
+            <p className="card-sub">Sign in to Asset Valet</p>
+
+            <form onSubmit={handleLogin}>
+              <div className="field">
+                <label className="field-label">Username</label>
+                <input type="text" className="field-input" placeholder="Enter your username"
+                  value={username} onChange={e => setUsername(e.target.value)} required autoFocus />
+              </div>
+              <div className="field">
+                <label className="field-label">Password</label>
+                <input type="password" className="field-input" placeholder="••••••••"
+                  value={password} onChange={e => setPassword(e.target.value)} required />
+              </div>
+              <div className="row-options">
+                <label className="remember">
+                  <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} />
+                  <span>Remember me</span>
+                </label>
+                <a href="#" className="forgot">Forgot Password?</a>
+              </div>
+              {error && <div className="error-msg">⚠ {error}</div>}
+              <button type="submit" className="btn-login" disabled={loading}>
+                {loading ? "Signing in..." : "Login"}
+              </button>
+            </form>
+
+            <div className="signup-row">
+              Don&apos;t have an account? <Link href="/signup">Sign Up</Link>
+            </div>
+
+            <div className="divider">
+              <div className="divider-line" />
+              <span className="divider-text">Or continue with</span>
+              <div className="divider-line" />
+            </div>
+
+            <div className="social-row">
+              <button className="social-btn" type="button">
+                <svg viewBox="0 0 24 24">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+              </button>
+              <button className="social-btn" type="button">
+                <svg viewBox="0 0 24 24" fill="#0A66C2">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+              </button>
+              <button className="social-btn" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#00f5b0" strokeWidth="1.5">
+                  <rect x="2" y="4" width="20" height="16" rx="3"/>
+                  <path d="M2 7l10 7 10-7"/>
+                </svg>
+              </button>
+            </div>
+
+            {/* Demo credentials */}
+            <div className="demo-box">
+              <div className="demo-title">Demo Credentials</div>
+              <div className="demo-grid">
+                <button className="demo-btn" type="button"
+                  onClick={() => { setUsername("admin"); setPassword("Admin@123"); }}>
+                  <div className="demo-role">Admin</div>
+                  <div className="demo-user">admin / Admin@123</div>
+                </button>
+                <button className="demo-btn" type="button"
+                  onClick={() => { setUsername("sara.khan"); setPassword("Pass@123"); }}>
+                  <div className="demo-role">Employee</div>
+                  <div className="demo-user">sara.khan / Pass@123</div>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

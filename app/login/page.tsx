@@ -80,9 +80,6 @@ export default function LoginPage() {
         @keyframes float1 { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-10px)} }
         @keyframes float2 { 0%,100%{transform:translateY(0px) rotate(2deg)} 50%{transform:translateY(-14px) rotate(2deg)} }
         @keyframes float3 { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-8px)} }
-        .stats { display:flex; gap:48px; }
-        .stat-value { font-size:22px; font-weight:700; color:#00f5b0; text-shadow:0 0 20px rgba(0,245,176,0.4); }
-        .stat-label { font-size:11px; color:#4a8870; font-weight:400; margin-top:2px; letter-spacing:0.05em; }
         .right { width:480px; display:flex; align-items:center; justify-content:center; padding:40px 48px; position:relative; z-index:1; }
         .card { width:100%; max-width:380px; background:rgba(5,28,22,0.7); border:1px solid rgba(0,245,176,0.15); border-radius:28px; padding:40px 36px; backdrop-filter:blur(24px); box-shadow:0 0 0 1px rgba(0,245,176,0.05),0 20px 60px rgba(0,0,0,0.6),inset 0 1px 0 rgba(0,245,176,0.1); animation:fadeInUp 0.6s ease both; }
         @keyframes fadeInUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
@@ -102,18 +99,9 @@ export default function LoginPage() {
         .btn-login { width:100%; padding:14px; background:linear-gradient(135deg,#00f5b0,#00c98f); border:none; border-radius:14px; font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:#020d0b; cursor:pointer; transition:all 0.2s; box-shadow:0 0 30px rgba(0,245,176,0.3); letter-spacing:0.02em; margin-bottom:20px; }
         .btn-login:hover { transform:translateY(-1px); box-shadow:0 0 40px rgba(0,245,176,0.45); }
         .btn-login:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
-        .signup-row { text-align:center; font-size:12.5px; color:#4a8870; margin-bottom:24px; }
+        .signup-row { text-align:center; font-size:12.5px; color:#4a8870; }
         .signup-row a { color:#00f5b0; text-decoration:none; font-weight:600; }
         .error-msg { background:rgba(255,80,80,0.08); border:1px solid rgba(255,80,80,0.2); border-radius:10px; padding:10px 14px; font-size:12px; color:#ff6b6b; margin-bottom:16px; text-align:center; }
-
-        /* Demo credentials */
-        .demo-box { margin-top:4px; padding:12px 14px; border-radius:12px; background:rgba(0,245,176,0.04); border:1px solid rgba(0,245,176,0.1); }
-        .demo-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(0,245,176,0.5); margin-bottom:8px; }
-        .demo-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-        .demo-btn { padding:8px 10px; border-radius:8px; background:rgba(0,245,176,0.06); border:1px solid rgba(0,245,176,0.15); cursor:pointer; text-align:left; font-family:'Sora',sans-serif; transition:all .15s; }
-        .demo-btn:hover { background:rgba(0,245,176,0.12); }
-        .demo-role { font-size:11px; font-weight:700; color:#00f5b0; }
-        .demo-user { font-size:10px; color:rgba(224,245,238,0.35); margin-top:1px; }
       `}</style>
 
       <div className="page">
@@ -160,12 +148,6 @@ export default function LoginPage() {
               </div>
             </div>
           </div>
-
-          <div className="stats">
-            <div><div className="stat-value">99.9%</div><div className="stat-label">Uptime</div></div>
-            <div><div className="stat-value">256-bit</div><div className="stat-label">Encrypted</div></div>
-            <div><div className="stat-value">Real-time</div><div className="stat-label">Tracking</div></div>
-          </div>
         </div>
 
         {/* RIGHT */}
@@ -209,24 +191,6 @@ export default function LoginPage() {
             <div className="signup-row">
               Don&apos;t have an account? <Link href="/signup">Sign Up</Link>
             </div>
-
-            {/* Demo credentials */}
-            <div className="demo-box">
-              <div className="demo-title">Demo Credentials</div>
-              <div className="demo-grid">
-                <button className="demo-btn" type="button"
-                  onClick={() => { setUsername("admin"); setPassword("Admin@123"); }}>
-                  <div className="demo-role">Admin</div>
-                  <div className="demo-user">admin / Admin@123</div>
-                </button>
-                <button className="demo-btn" type="button"
-                  onClick={() => { setUsername("sara.khan"); setPassword("Pass@123"); }}>
-                  <div className="demo-role">Employee</div>
-                  <div className="demo-user">sara.khan / Pass@123</div>
-                </button>
-              </div>
-            </div>
-
           </div>
         </div>
       </div>

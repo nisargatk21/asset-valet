@@ -102,10 +102,12 @@ export default function LoginPage() {
         .btn-login { width:100%; padding:14px; background:linear-gradient(135deg,#00f5b0,#00c98f); border:none; border-radius:14px; font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:#020d0b; cursor:pointer; transition:all 0.2s; box-shadow:0 0 30px rgba(0,245,176,0.3); letter-spacing:0.02em; margin-bottom:20px; }
         .btn-login:hover { transform:translateY(-1px); box-shadow:0 0 40px rgba(0,245,176,0.45); }
         .btn-login:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
-        .signup-row { text-align:center; font-size:12.5px; color:#4a8870; margin-bottom:0; }
+        .signup-row { text-align:center; font-size:12.5px; color:#4a8870; margin-bottom:24px; }
         .signup-row a { color:#00f5b0; text-decoration:none; font-weight:600; }
         .error-msg { background:rgba(255,80,80,0.08); border:1px solid rgba(255,80,80,0.2); border-radius:10px; padding:10px 14px; font-size:12px; color:#ff6b6b; margin-bottom:16px; text-align:center; }
-        .demo-box { margin-top:20px; padding:12px 14px; border-radius:12px; background:rgba(0,245,176,0.04); border:1px solid rgba(0,245,176,0.1); }
+
+        /* Demo credentials */
+        .demo-box { margin-top:4px; padding:12px 14px; border-radius:12px; background:rgba(0,245,176,0.04); border:1px solid rgba(0,245,176,0.1); }
         .demo-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(0,245,176,0.5); margin-bottom:8px; }
         .demo-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
         .demo-btn { padding:8px 10px; border-radius:8px; background:rgba(0,245,176,0.06); border:1px solid rgba(0,245,176,0.15); cursor:pointer; text-align:left; font-family:'Sora',sans-serif; transition:all .15s; }
@@ -208,6 +210,7 @@ export default function LoginPage() {
               Don&apos;t have an account? <Link href="/signup">Sign Up</Link>
             </div>
 
+            {/* Demo credentials */}
             <div className="demo-box">
               <div className="demo-title">Demo Credentials</div>
               <div className="demo-grid">
